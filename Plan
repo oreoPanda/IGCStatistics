@@ -18,3 +18,5 @@ UI
 - tabbed window containing for example either a QTabBar or a QTabWidget
 - in one tab there should be a StatisticView
 - one tab should include general data from the top part of the igc file (H records probably)
+
+I have big plans for this repository!! This is a new branch where they will be implemented into code!!
