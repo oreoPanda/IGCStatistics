@@ -1,0 +1,20 @@
+Reason: new architecture needed
+
+StatisticsView and Statistic contain too many functions
+
+Statistic generates data in form of QLineSeries
+- for each type of data there is a private function
+- one slot to request certain data generation which emits a signal
+- types of data can be stored in enum in Statistic.h
+- classes that want to use Statistic need to include Statistic.h
+
+StatisticView shows data
+- can inherit QChartView
+- its chart can contain series of data (for cool, smooth looking series, use QSplineSeries!)
+- the name of the series can be used for switching as user requests
+- check out: QAbstractSeries::useOpenGL
+
+UI
+- tabbed window containing for example either a QTabBar or a QTabWidget
+- in one tab there should be a StatisticView
+- one tab should include general data from the top part of the igc file (H records probably)

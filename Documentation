@@ -1,0 +1,18 @@
+Data transfer between classes
+
+Lifetime of data: Data is transferred via Qt's Signals and Slots mechanism. Since all QObjects
+are created in the same thread and not moved, connection of signals does
+not specify a connection type. Qt::AutoConnection makes Qt use Qt::DirectConnection.
+This makes Slot be called directly and executred in the signalling thread, no
+need to worry about the objects that are passes as arguments being deleted before
+the Slot is done.
+
+Time spent copying data: To keep copying time low, objects are passed by reference.
+
+Information encapsulation: To secure that the source data is not modified through
+the reference, the reference will be to const data.
+
+
+
+Data management of IGC-Statistics
+- StatisticsView requests
