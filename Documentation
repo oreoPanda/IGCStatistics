@@ -1,3 +1,6 @@
+Warning: The "Remove" Button in Qt git branches dialog is dangerous!
+    it does `git branch -D [branch]` which deletes the branch regardless of its merged state!
+
 Data transfer between classes
 
 Lifetime of data: Data is transferred via Qt's Signals and Slots mechanism. Since all QObjects
