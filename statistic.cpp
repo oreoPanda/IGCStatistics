@@ -3,18 +3,13 @@
 /*TODO rethink time, the log time could be used on X axis, not the time since first logged point*/
 
 Statistic::Statistic(QObject *parent)
-    : QObject(parent),  //TODO check calls constructor of parent?
-      altitudedeltaseries(nullptr),
-      distancedeltaseries(nullptr)
+    : QObject(parent)  //TODO check calls constructor of parent?
 {
 
 }
 
 Statistic::~Statistic()
 {
-    //TODO check what happens in valgrind if I don't delete
-    delete altitudedeltaseries;
-    delete distancedeltaseries;
     //TODO check destructor of QObject is called automatically?
 }
 
@@ -29,23 +24,25 @@ void Statistic::getData(DataType t)
 {
     switch(t)
     {
-    case ALTITUDE:  emit data(calculate_altitudeData());
-    case DISTANCE:  emit data(calculate_distanceData());
-    case FLIGHT:    emit data(calculate_flightData());
-    case INTERVAL:  emit data(calculate_intervalData());
-    case SPEED:     emit data(calculate_speedData());
+    case ALTITUDE:  emit data(calculate_altitudeData());break;
+    case DISTANCE:  emit data(calculate_distanceData());break;
+    case FLIGHT:    emit data(calculate_flightData());break;
+    case INTERVAL:  emit data(calculate_intervalData());break;
+    case SPEED:     emit data(calculate_speedData());break;
 
     case ALTITUDEDELTA:{
-        if(!this->altitudedeltaseries){
+        if(this->altitudedelta.empty() ){
             calculate_altitudeData();
         }
-        emit data(new QLineSeries(this->altitudedeltaseries));
+        emit data(altitudedelta);
+        break;
     }
     case DISTANCEDELTA:{
-        if(!this->distancedeltaseries){
+        if(this->distancedelta.empty() ){
             calculate_distanceData();
         }
-        emit data(new QLineSeries(this->distancedeltaseries));
+        emit data(distancedelta);
+        break;
     }
     }
 }
@@ -56,35 +53,31 @@ void Statistic::getData(DataType t)
     file points 1 to 2 are in series point 1
     ...
     file points 2999 to 3000 are in series point 2999*/
-QLineSeries * Statistic::calculate_altitudeData()//TODO think of choosing an altitude type TODO what if fixrecords is still empty?
+const QList<QPointF> & Statistic::calculate_altitudeData()//TODO think of choosing an altitude type TODO what if fixrecords is still empty?
 {
-    static QLineSeries *altitudeseries = new QLineSeries();
-    if(altitudeseries->count() > 0){
-        return altitudeseries;
+    if( !this->altitude.empty() ){
+        return this->altitude;
     }
-    this->altitudedeltaseries = new QLineSeries();
 
     ushort time = 0;
 
     for(int i = STEPSIZE; i < fixrecords.size(); i+=STEPSIZE)
     {
         time += fixrecords.at(i).time - fixrecords.at(i-STEPSIZE).time;
-        *altitudeseries << QPointF(time, fixrecords.at(i).altitude.GNSSAlt);
-        *altitudedeltaseries << QPointF(time, fixrecords.at(i).altitude.GNSSAlt - fixrecords.at(i-STEPSIZE).altitude.GNSSAlt);
+        this->altitude << QPointF(time, fixrecords.at(i).altitude.pressureAlt);
+        this->altitudedelta << QPointF(time, fixrecords.at(i).altitude.pressureAlt - fixrecords.at(i-STEPSIZE).altitude.pressureAlt);
     }
 
-    return altitudeseries;
+    return altitude;
 }
 
 /*TODO CHECK: distancedeltaseries should contain point 0, value at index 0 and point 1, value at index 1*/
 /*TODO CHECK: all series should be shorter than the fixrecord by one*/
-QLineSeries * Statistic::calculate_distanceData()
+const QList<QPointF> & Statistic::calculate_distanceData()
 {
-    static QLineSeries * distanceseries = new QLineSeries();
-    if(distanceseries->count() > 0){
-        return distanceseries;
+    if( !distance.empty() ){
+        return this->distance;
     }
-    this->distancedeltaseries = new QLineSeries();
 
     ushort time = 0;
     double distance = 0;
@@ -95,68 +88,67 @@ QLineSeries * Statistic::calculate_distanceData()
         time += (fixrecords.at(i).time - fixrecords.at(i-STEPSIZE).time);
         delta = fixrecords.at(i).position - fixrecords.at(i-STEPSIZE).position;
         distance += delta;
-        *distanceseries << QPointF(time, distance);    //same as distanceseries->append(time, distance)
-        *distancedeltaseries << QPointF(time, delta);
+        this->distance << QPointF(time, distance);
+        this->distancedelta << QPointF(time, delta);
     }
 
-    return distanceseries;
+    /*return pointer to new object so that the static pointer won't point to invalid memory some time*/
+    return this->distance;
 }
 
-QLineSeries * Statistic::calculate_flightData()
+const QList<QPointF> & Statistic::calculate_flightData()
 {
-    QLineSeries *flight = new QLineSeries();
-
     for(int i = 0; i < fixrecords.size(); i++)
     {
-        *flight << QPointF(fixrecords.at(i).position.longitude, fixrecords.at(i).position.latitude);
+        this->flight << QPointF(fixrecords.at(i).position.longitude, fixrecords.at(i).position.latitude);
     }
 
-    return flight;
+    return this->flight;
+}
+
+/*The interval is given with index of B record on X axis, not time like all the others*/
+const QList<QPointF> & Statistic::calculate_intervalData()
+{
+    if( !this->interval.empty() ){
+        return this->interval;
+    }
+    for(int i = STEPSIZE; i < fixrecords.size(); i++)
+    {
+        ushort seconds = fixrecords.at(i).time - fixrecords.at(i-STEPSIZE).time;
+        this->interval << QPoint(i, seconds);
+    }
+
+    return this->interval;
 }
 
 /*TODO CHECK: Here again: I is one ahead of the index of the two delta series*/
-QLineSeries * Statistic::calculate_speedData()
+const QList<QPointF> & Statistic::calculate_speedData()
 {
-    QLineSeries *speedseries = new QLineSeries();
+    if( !this->speed.empty() ){
+        return this->speed;
+    }
 
     ushort time = 0;
 
-    if(!this->altitudedeltaseries){
+    if(this->altitudedelta.empty() ){
         calculate_altitudeData();
     }
-    if(!this->distancedeltaseries){
+    if(this->distancedelta.empty() ){
         calculate_distanceData();
     }
     for(int i = STEPSIZE; i < fixrecords.size(); i++)
     {
         ushort t = fixrecords.at(i).time - fixrecords.at(i-1).time;
-        short a = this->altitudedeltaseries->at(i-STEPSIZE).y();
-        double d = this->distancedeltaseries->at(i-STEPSIZE).y() * 1000;
+        short a = this->altitudedelta.at(i-STEPSIZE).y();
+        double d = this->distancedelta.at(i-STEPSIZE).y() * 1000;
         /*Take the altitude change into account for a more exact speed calculation: Find the length of the hypotenuse*/
         double hypotenuse = sqrt(pow(a, 2) + pow(d, 2));
         /*Calculate the speed across the hypotenuse in km/h*/
         double speed = hypotenuse / t * 3.6;
-        if(speed < 70 || speed > 130)
-        {
-
-        }
 
         time += t;
-        *speedseries << QPointF(time, speed);
+        this->speed << QPointF(time, speed);
     }
 
-    return speedseries;
-}
-
-QLineSeries * Statistic::calculate_intervalData() const
-{
-    QLineSeries * const intervalseries = new QLineSeries();
-
-    for(int i = STEPSIZE; i < fixrecords.size(); i++)
-    {
-        ushort seconds = fixrecords.at(i).time - fixrecords.at(i-STEPSIZE).time;
-        *intervalseries << QPoint(i, seconds);
-    }
-
-    return intervalseries;
+    return this->speed;
 }

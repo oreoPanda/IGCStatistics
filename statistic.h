@@ -22,7 +22,7 @@ public:
     ~Statistic();
 
 signals:
-    void data(QLineSeries * const s) const;
+    void data(const QList<QPointF> & data) const;
 
 public slots:
     void set_GPSData(const QList<Fix> & fixlist);
@@ -32,16 +32,21 @@ private:
     QStringList lines;
     QList<Fix> fixrecords;
 
-    /*Series stored in this class for faster speed calculation*/
-    QLineSeries *altitudedeltaseries;
-    QLineSeries *distancedeltaseries;
+    /*All implemented data series*/
+    QList<QPointF> altitude;
+    QList<QPointF> altitudedelta;
+    QList<QPointF> distance;
+    QList<QPointF> distancedelta;
+    QList<QPointF> flight;
+    QList<QPointF> interval;
+    QList<QPointF> speed;
 
     /*Calculation functions*/
-    QLineSeries *calculate_altitudeData();
-    QLineSeries *calculate_distanceData();
-    QLineSeries *calculate_flightData();
-    QLineSeries *calculate_intervalData() const;
-    QLineSeries *calculate_speedData();
+    const QList<QPointF> & calculate_altitudeData();
+    const QList<QPointF> & calculate_distanceData();
+    const QList<QPointF> & calculate_flightData();
+    const QList<QPointF> & calculate_intervalData();
+    const QList<QPointF> & calculate_speedData();
 };
 
 #endif // STATISTIC_H

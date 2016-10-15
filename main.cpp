@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     QObject::connect(&w, SIGNAL(requestData(DataType)), &stat, SLOT(getData(DataType)) );
 
     //QObject::connect(&w, SIGNAL(requestSpeedData()), &stat, SLOT(calculate_intervalData()) );
-    QObject::connect(&stat, SIGNAL(data(QLineSeries * const)), &w, SLOT(plotData(QLineSeries * const)) );
+    QObject::connect(&stat, SIGNAL(data(const QList<QPointF> &)), &w, SLOT(plotData(const QList<QPointF> &)) );
 
     w.show();
 

@@ -23,7 +23,7 @@ public slots:
     void compareModeToggled(bool checked);
     void change_shown_Adata(const QString & dataname);
     void change_shown_Bdata(const QString & dataname);
-    void plotData(QLineSeries * const data);
+    void plotData(const QList<QPointF> & data);
 
 signals:
     void requestData(DataType);

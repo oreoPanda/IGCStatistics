@@ -55,18 +55,24 @@ void StatisticsView::change_shown_Bdata(const QString &dataname)
 void StatisticsView::change_shown_data(const QString & dataname)
 {
     QList<QAbstractSeries *> loadedseries = ui->chartview->chart()->series();
+
     /*check which type of data the request is asking for*/
     for(int i = 0; i < DTCOUNT; i++)
     {
         if(dataname == this->datanames.at(i)){
             /*check if the requested data is already available*/
+            bool available = false;
             foreach(QAbstractSeries *s, loadedseries)
             {
                 if(s->name() == dataname)
                 {
                     s->setVisible(true);
+                    available = true;
+                    break;
                 }
-                else emit requestData(static_cast<DataType>(i));
+            }
+            if(!available){
+                emit requestData(static_cast<DataType>(i));
             }
         }
     }
@@ -75,36 +81,50 @@ void StatisticsView::change_shown_data(const QString & dataname)
 /*Hand control over the memory of the Line Series to the chart,
  * connect a signal in order to notice when the Series get deleted*/
 /*The first series added to the chart will belong to the A set*/
-void StatisticsView::plotData(QLineSeries * data)
+void StatisticsView::plotData(const QList<QPointF> & data)
 {
     QChart *chart = ui->chartview->chart();
+    QLineSeries *series = new QLineSeries();
 
     /*Add data to chart*/
-    chart->addSeries(data);
-    data->attachAxis(chart->axisX());
+    *series << data;
+    chart->addSeries(series);
+    series->attachAxis(chart->axisX());
 
     //data->setPointsVisible(true);
+    /*resize the axes in order to fit data
+        - calculate maximum and minimum on X and Y axes
+        - resize*/
+    double Xmin = 0;
+    double Xmax = 0;
+    double Ymin = 0;
+    double Ymax = 0;
+    for(int i = 0; i<series->count(); i++)
+    {
+        const QPointF & p = series->at(i);
+        if(p.x() < Xmin){
+            Xmin = p.x();
+        }else if(p.x() > Xmax){
+            Xmax = p.x();
+        }
+        if(p.y() < Ymin){
+            Ymin = p.y();
+        }else if(p.y() > Ymax){
+            Ymax = p.y();
+        }
+    }
 
     /*Check which set to add the data to and edit color and legend of data*/
     if(!activedata){
-        activedata = data;
-        data->attachAxis(Yleft);
+        activedata = series;
+        series->attachAxis(Yleft);
+        Yleft->setRange(Ymin, Ymax);
     }
     else{
-        comparedata = data;
-        data->attachAxis(Yright);
+        comparedata = series;
+        series->attachAxis(Yright);
+        Yright->setRange(Ymin, Ymax);
     }
-    /*resize the axes in order to fit data
-        - calculate average
-        - resize*/
-    double average = 0;
-    for(int i = 0; i<data->count(); i++)    //TODO this assumes the series have first point at index 0
-    {
-        average += data->at(i).y();
-    }
-    average /= data->count();         //TODO same assumption here
-
-    //chart->axisY(data)->setMax(2*average);
 }
 
 void StatisticsView::deactivate(QLineSeries * & active)
