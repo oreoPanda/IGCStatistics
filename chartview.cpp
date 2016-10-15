@@ -1,12 +1,12 @@
-#include "statisticschartview.h"
+#include "chartview.h"
 
-StatisticsChartView::StatisticsChartView(QWidget *parent)
+ChartView::ChartView(QWidget *parent)
     :QChartView(parent)
 {
 
 }
 
-void StatisticsChartView::mouseMoveEvent(QMouseEvent *event)
+void ChartView::mouseMoveEvent(QMouseEvent *event)
 {
     static QPoint lastPos = event->pos();
 
@@ -21,7 +21,7 @@ void StatisticsChartView::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-void StatisticsChartView::wheelEvent(QWheelEvent *event)
+void ChartView::wheelEvent(QWheelEvent *event)
 {
     if(event->angleDelta().ry() > 0){
         chart()->zoom(1.2);

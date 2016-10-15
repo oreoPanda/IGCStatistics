@@ -3,11 +3,19 @@
 /*TODO rethink time, the log time could be used on X axis, not the time since first logged point*/
 
 Statistic::Statistic(QObject *parent)
-    : QObject(parent),
+    : QObject(parent),  //TODO check calls constructor of parent?
       altitudedeltaseries(nullptr),
       distancedeltaseries(nullptr)
 {
 
+}
+
+Statistic::~Statistic()
+{
+    //TODO check what happens in valgrind if I don't delete
+    delete altitudedeltaseries;
+    delete distancedeltaseries;
+    //TODO check destructor of QObject is called automatically?
 }
 
 /*slot to set gps data from an igc file*/
@@ -16,46 +24,30 @@ void Statistic::set_GPSData(const QList<Fix> & fixlist)
     fixrecords = fixlist;
 }
 
-/*public slots that are to be used with a UI*/
-void Statistic::altitudeStats()
+/*slot to be used with UI*/
+void Statistic::getData(DataType t)
 {
-    emit data(calculate_altitudeData());
-}
+    switch(t)
+    {
+    case ALTITUDE:  emit data(calculate_altitudeData());
+    case DISTANCE:  emit data(calculate_distanceData());
+    case FLIGHT:    emit data(calculate_flightData());
+    case INTERVAL:  emit data(calculate_intervalData());
+    case SPEED:     emit data(calculate_speedData());
 
-void Statistic::altitudeDeltaStats()
-{
-    if(!altitudedeltaseries){
-        calculate_altitudeData();
+    case ALTITUDEDELTA:{
+        if(!this->altitudedeltaseries){
+            calculate_altitudeData();
+        }
+        emit data(new QLineSeries(this->altitudedeltaseries));
     }
-    emit data(altitudedeltaseries);
-}
-
-void Statistic::distanceStats()
-{
-    emit data(calculate_distanceData());
-}
-
-void Statistic::distanceDeltaStats()
-{
-    if(!distancedeltaseries){
-        calculate_distanceData();
+    case DISTANCEDELTA:{
+        if(!this->distancedeltaseries){
+            calculate_distanceData();
+        }
+        emit data(new QLineSeries(this->distancedeltaseries));
     }
-    emit data(distancedeltaseries);
-}
-
-void Statistic::flightStats()
-{
-    emit data(calculate_flightData());
-}
-
-void Statistic::intervalStats() const
-{
-    emit data(calculate_intervalData());
-}
-
-void Statistic::speedStats()
-{
-    emit data(calculate_speedData());
+    }
 }
 
 /*private calculation functions that return a line series. Control over its deletion is handed over to the signal receiver*/

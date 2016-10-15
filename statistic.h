@@ -2,7 +2,7 @@
 #define STATISTIC_H
 
 #include "igctypes.h"
-
+#include "data.h"
 #include <QObject>
 #include <QList>
 #include <QtCharts>
@@ -19,19 +19,14 @@ class Statistic : public QObject
     Q_OBJECT
 public:
     explicit Statistic(QObject *parent = 0);
+    ~Statistic();
 
 signals:
     void data(QLineSeries * const s) const;
 
 public slots:
     void set_GPSData(const QList<Fix> & fixlist);
-    void altitudeStats();
-    void altitudeDeltaStats();
-    void distanceStats();
-    void distanceDeltaStats();
-    void flightStats();
-    void intervalStats() const;
-    void speedStats();
+    void getData(DataType t);
 
 private:
     QStringList lines;

@@ -20,3 +20,5 @@ UI
 - one tab should include general data from the top part of the igc file (H records probably)
 
 I have big plans for this repository!! This is a new branch where they will be implemented into code!!
+
+idea: the active data is greyed out in combobox

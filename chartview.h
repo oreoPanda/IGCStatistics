@@ -6,10 +6,10 @@
 
 using namespace QtCharts;
 
-class StatisticsChartView : public QChartView
+class ChartView : public QChartView
 {
 public:
-    StatisticsChartView(QWidget *parent = Q_NULLPTR);
+    ChartView(QWidget *parent = Q_NULLPTR);
 
 protected:
     void mouseMoveEvent(QMouseEvent *event);

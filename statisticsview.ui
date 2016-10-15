@@ -19,12 +19,12 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
     <item>
-     <widget class="StatisticsChartView" name="chartview" native="true"/>
+     <widget class="ChartView" name="chartview" native="true"/>
     </item>
     <item>
      <layout class="QVBoxLayout" name="labelLayout">
       <item>
-       <widget class="QLabel" name="labelDataA">
+       <widget class="QLabel" name="datalabel">
         <property name="maximumSize">
          <size>
           <width>40</width>
@@ -37,7 +37,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="labelCompare">
+       <widget class="QLabel" name="comparelabel">
         <property name="maximumSize">
          <size>
           <width>60</width>
@@ -50,7 +50,10 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="comparedatalabel">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="maximumSize">
          <size>
           <width>40</width>
@@ -70,7 +73,7 @@
     <item>
      <layout class="QVBoxLayout" name="inputLayout">
       <item>
-       <widget class="QComboBox" name="comboBoxA">
+       <widget class="QComboBox" name="datachooser">
         <property name="maximumSize">
          <size>
           <width>100</width>
@@ -126,7 +129,10 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="comboBox">
+       <widget class="QComboBox" name="comparedatachooser">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="maximumSize">
          <size>
           <width>100</width>
@@ -185,16 +191,16 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>StatisticsChartView</class>
+   <class>ChartView</class>
    <extends>QWidget</extends>
-   <header>statisticschartview.h</header>
+   <header>chartview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
  <connections>
   <connection>
-   <sender>comboBoxA</sender>
+   <sender>datachooser</sender>
    <signal>activated(QString)</signal>
    <receiver>StatisticsView</receiver>
    <slot>change_shown_Adata(QString)</slot>
@@ -204,13 +210,13 @@
      <y>67</y>
     </hint>
     <hint type="destinationlabel">
-     <x>558</x>
-     <y>40</y>
+     <x>528</x>
+     <y>276</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>comboBox</sender>
+   <sender>comparedatachooser</sender>
    <signal>activated(QString)</signal>
    <receiver>StatisticsView</receiver>
    <slot>change_shown_Bdata(QString)</slot>
@@ -220,8 +226,40 @@
      <y>107</y>
     </hint>
     <hint type="destinationlabel">
-     <x>425</x>
-     <y>39</y>
+     <x>473</x>
+     <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxCompare</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>StatisticsView</receiver>
+   <slot>compareModeToggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>633</x>
+     <y>84</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>625</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxCompare</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>comparedatachooser</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>626</x>
+     <y>85</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>525</x>
+     <y>108</y>
     </hint>
    </hints>
   </connection>

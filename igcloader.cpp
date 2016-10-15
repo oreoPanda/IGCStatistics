@@ -32,7 +32,6 @@ void IGCLoader::load(const QString file)
 void IGCLoader::parse()
 {
     QString line;
-    //QString fix("B1023544352219S00609854EV007580000000001500000000"); //B record string
     double lastlat = 0;
     double lastlong = 0;
 
