@@ -4,26 +4,18 @@
 StatisticsView::StatisticsView(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::StatisticsView),
-    Yleft(nullptr),
-    Yright(nullptr),
+    Yleft(new QValueAxis()),
+    Yright(new QValueAxis()),
     activedata(nullptr),
     comparedata(nullptr)
 {
     /*Define the names of data*/
-    datanames << "Altitude";
-    datanames << "Altitude Delta";
-    datanames << "Distance";
-    datanames << "Distance Delta";
-    datanames << "Flight";
-    datanames << "Interval";
-    datanames << "Speed";
+    datanames << "Altitude" << "Altitude Delta" << "Distance" << "Distance Delta" << "Flight" << "Interval" << "Speed";
 
     /*set up the UI*/
     ui->setupUi(this);
 
     /*set up the chart's axes*/
-    Yleft = new QValueAxis();
-    Yright = new QValueAxis();
     ui->chartview->chart()->addAxis(new QValueAxis(), Qt::AlignBottom);
     ui->chartview->chart()->addAxis(Yleft, Qt::AlignLeft);
     ui->chartview->chart()->addAxis(Yright, Qt::AlignRight);
@@ -113,14 +105,6 @@ void StatisticsView::plotData(QLineSeries * data)
     average /= data->count();         //TODO same assumption here
 
     //chart->axisY(data)->setMax(2*average);
-
-    /*little playground*/
-    QPoint p;
-    int rx = p.rx();
-    int & rrx = p.rx();
-    rx = 3;     //should not set x in p
-    rrx = 5;    //should set x in p
-    int  x = p.x();
 }
 
 void StatisticsView::deactivate(QLineSeries * & active)
