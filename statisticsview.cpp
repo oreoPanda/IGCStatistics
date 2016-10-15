@@ -43,12 +43,16 @@ void StatisticsView::change_shown_Adata(const QString &dataname)
 {
     deactivate(activedata);
     change_shown_data(dataname);
+     activedata->setName(dataname);
+    ui->chartview->chart()->axisY(activedata)->setTitleText(activedata->name());
 }
 
 void StatisticsView::change_shown_Bdata(const QString &dataname)
 {
     deactivate(comparedata);
     change_shown_data(dataname);
+    comparedata->setName(dataname);
+    ui->chartview->chart()->axisY(comparedata)->setTitleText(comparedata->name());
 }
 
 /*request the data that belongs to the given name*/
